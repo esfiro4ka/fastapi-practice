@@ -6,3 +6,8 @@ class User(BaseModel):
     age: int
     # для второго варианта:
     # is_adult: bool = False
+
+
+class Feedback(BaseModel):
+    name: str
+    message: str

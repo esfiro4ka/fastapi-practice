@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from .models.models import User
+from .models.models import User, Feedback
 
 
 app = FastAPI()
@@ -25,3 +25,19 @@ async def check_adult(user: User):
 # async def add_user(user: User):
 #     is_adult = user.age >= 18
 #     return {**user.model_dump(), "is_adult": is_adult}
+
+
+feedback_list = []
+
+
+@app.post("/feedback")
+async def feedback(feedback: Feedback):
+    feedback_list.append({"name": feedback.name, "message": feedback.message})
+    return {
+        "message": f"Feedback received. Thank you, {feedback.name}!"
+    }
+
+
+@app.get("/reviews")
+async def show_feedback_list():
+    return feedback_list
