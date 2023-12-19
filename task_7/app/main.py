@@ -1,5 +1,7 @@
-from fastapi import FastAPI, Response
+from fastapi import FastAPI, Response, Cookie
 from .models.models import User
+from typing import Optional
+import uuid
 
 
 app = FastAPI()
@@ -11,15 +13,29 @@ sample_users = [
 ]
 
 
+def generate_session_token():
+    return str(uuid.uuid4())
+
+
 @app.post("/login")
-async def logout_user(current_user: User, response: Response):
+async def login_user(current_user: User, response: Response):
     for user in sample_users:
         if (user["username"] == current_user.username and
            user["password"] == current_user.password):
-            session_token = "abc123xyz456"
+            session_token = generate_session_token()
             user["session_token"] = session_token
             response.set_cookie(
                 key="session_token", value=session_token, httponly=True
             )
             return {"message": "Cookie установлены"}
     return {"message": "Неверные username или password"}
+
+
+@app.get("/user")
+async def user_info(session_token: Optional[str] = Cookie(None)):
+    if session_token is None:
+        return {"message": "Пользователь неавторизован"}
+    for user in sample_users:
+        if user["session_token"] == session_token:
+            return user
+    return {"message": "Пользователь неавторизован"}
