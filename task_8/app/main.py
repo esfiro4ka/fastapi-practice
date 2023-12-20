@@ -31,13 +31,13 @@ def get_headers(request: Request):
 # альтернативный вариант:
 
 
-# def check_accept_language(request: Request):
+# def check_accept_language(accept_language):
 #     pattern = r"(?i:(?:\*|[a-z\-]{2,5})(?:;q=\d\.\d)?,)+(?:\*|[a-z\-]{2,5})(?:;q=\d\.\d)?"
-#     if not re.fullmatch(pattern, request.headers["Accept-Language"]):
+#     if not re.fullmatch(pattern, accept_language):
 #         raise HTTPException(
 #             status_code=400,
-#             detail="Incorrect header The Accept-Language format"
-#         )
+#             detail="Incorrect header The Accept-Language format")
+
 
 # @app.get("/headers")
 # def get_headers(user_agent: Annotated[str | None, Header()] = None,
@@ -46,5 +46,6 @@ def get_headers(request: Request):
 #         raise HTTPException(
 #             status_code=400,
 #             detail="The User-Agent or Accept-Language not found!")
+#     check_accept_language(accept_language)
 #     return {"User-Agent": user_agent,
 #             "Accept-Language": accept_language}
