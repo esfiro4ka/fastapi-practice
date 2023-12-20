@@ -31,6 +31,7 @@ async def login_user(current_user: User, response: Response):
     return {"message": "Неверные username или password"}
 
 
+# Postman: Cookies -> Manage cookies
 @app.get("/user")
 async def user_info(session_token: Optional[str] = Cookie(None)):
     if session_token is None:

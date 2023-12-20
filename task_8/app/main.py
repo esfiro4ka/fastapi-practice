@@ -15,6 +15,7 @@ def check_accept_language(request: Request):
             detail="Incorrect header The Accept-Language format")
 
 
+# Headers: key = "Accept-Language", value = "en-US,en;q=0.9,es;q=0.8"
 @app.get("/headers")
 def get_headers(request: Request):
     if "User-Agent" not in request.headers:
