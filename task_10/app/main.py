@@ -3,6 +3,10 @@ from fastapi.security import OAuth2PasswordBearer
 from .models.models import User
 import jwt
 from datetime import datetime, timedelta
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 app = FastAPI()
@@ -10,7 +14,7 @@ app = FastAPI()
 # Authorization Type: OAuth 2.0, Token: access_token, Header Prefix: Bearer
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
-SECRET_KEY = "mysecretkey"
+SECRET_KEY = os.environ.get("MY_APP_SECRET_KEY")
 ALGORITHM = "HS256"
 
 expiration_time = datetime.utcnow() + timedelta(hours=24)
