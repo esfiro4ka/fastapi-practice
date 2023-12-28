@@ -5,6 +5,8 @@ import jwt
 from datetime import datetime, timedelta
 import os
 from dotenv import load_dotenv
+from passlib.context import CryptContext
+
 
 load_dotenv()
 
@@ -19,9 +21,19 @@ ALGORITHM = "HS256"
 
 expiration_time = datetime.utcnow() + timedelta(hours=24)
 
+crypt_ctx = CryptContext(schemes=['bcrypt'])
+
+
+def encode_password(password: str):
+    return crypt_ctx.hash(password)
+
+
+def verify_password(password: str, encoded_password: str):
+    return crypt_ctx.verify(password, encoded_password)
+
 
 USERS_DATA = [
-    {"username": "john_doe", "password": "securepassword123"}
+    {"username": "john_doe", "password": encode_password("securepassword123")}
 ]
 
 
@@ -30,6 +42,13 @@ def get_user(username: str):
         if user.get("username") == username:
             return user
     return None
+
+
+def authenticate_user(username: str, password: str):
+    user = get_user(username)
+    if not user or not crypt_ctx.verify(password, user["password"]):
+        return None
+    return user
 
 
 def create_jwt_token(data: dict, expiration_time: datetime):
@@ -50,13 +69,13 @@ def get_user_from_token(token: str = Depends(oauth2_scheme)):
 
 @app.post("/login")
 async def login(user_in: User):
-    for user in USERS_DATA:
-        if (user.get("username") == user_in.username and
-           user.get("password") == user_in.password):
-            return {
-                "access_token": create_jwt_token(
-                    {"sub": user_in.username}, expiration_time),
-                "token_type": "bearer"}
+    user = authenticate_user(user_in.username, user_in.password)
+    if user:
+        return {
+            "access_token": create_jwt_token(
+                {"sub": user_in.username}, expiration_time),
+            "token_type": "bearer"
+        }
     return {"error": "Invalid credentials"}
 
 
