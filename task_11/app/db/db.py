@@ -2,7 +2,12 @@ from ..auth.crypt import encode_password
 
 
 USERS_DATA = [
-    {"username": "john_doe", "password": encode_password("securepassword123")}
+    {"username": "admin",
+     "password": encode_password("securepassword123"),
+     "role": "admin"},
+    {"username": "user",
+     "password": encode_password("securepassword456"),
+     "role": "user"},
 ]
 
 
