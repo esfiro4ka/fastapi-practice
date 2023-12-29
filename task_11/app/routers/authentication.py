@@ -2,8 +2,8 @@ from fastapi import APIRouter
 from fastapi.security import OAuth2PasswordBearer
 
 from ..models.models import User
-from ..utils.security import (create_jwt_token, get_authenticate_user,
-                              expiration_time)
+from ..auth.security import (create_jwt_token, get_authenticate_user,
+                             expiration_time)
 
 router = APIRouter()
 

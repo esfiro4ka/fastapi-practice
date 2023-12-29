@@ -1,4 +1,4 @@
-from ..utils.crypt import encode_password
+from ..auth.crypt import encode_password
 
 
 USERS_DATA = [

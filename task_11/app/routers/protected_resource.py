@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 
-from ..utils.dependecies import get_user_from_token
-from ..utils.security import get_user
+from ..auth.dependecies import get_user_from_token
+from ..auth.security import get_user
 
 router = APIRouter()
 
