@@ -1,7 +1,11 @@
 from datetime import datetime, timedelta
+from passlib.context import CryptContext
 import jwt
-from .config import ALGORITHM, SECRET_KEY, crypt_ctx
+from .config import ALGORITHM, SECRET_KEY
 from ..db.db import get_user
+
+
+crypt_ctx = CryptContext(schemes=['bcrypt'])
 
 expiration_time = datetime.utcnow() + timedelta(hours=24)
 

@@ -16,7 +16,9 @@ async def login(user_in: User):
     if user:
         return {
             "access_token": create_jwt_token(
-                {"sub": user_in.username}, expiration_time),
+                {"sub": user_in.username, "role": user.get("role")},
+                expiration_time
+            ),
             "token_type": "bearer"
         }
     return {"error": "Invalid credentials"}
