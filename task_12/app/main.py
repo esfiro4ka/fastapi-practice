@@ -43,22 +43,23 @@ async def create_task(task: TaskCreate):
     return dict(data)
 
 
-@app.get("/tasks/{task_id}", response_model=Task)
-async def read_task(task_id: int):
-    query = "SELECT * FROM tasks WHERE id = :id"
-    existing_task = await database.fetch_one(query, values={"id": task_id})
-    if existing_task:
-        return Task(**dict(existing_task))
-    else:
-        raise HTTPException(status_code=404, detail="Task not found")
-
-
-@app.put("/tasks/{task_id}/update", response_model=Task)
-async def update_task(task_id: int, task: TaskUpdate):
+async def get_existing_task(task_id: int):
     query = "SELECT * FROM tasks WHERE id = :id"
     existing_task = await database.fetch_one(query, values={"id": task_id})
     if existing_task is None:
         raise HTTPException(status_code=404, detail="Task not found")
+    return existing_task
+
+
+@app.get("/tasks/{task_id}", response_model=Task)
+async def read_task(task_id: int):
+    existing_task = await get_existing_task(task_id)
+    return dict(existing_task)
+
+
+@app.put("/tasks/{task_id}/update", response_model=Task)
+async def update_task(task_id: int, task: TaskUpdate):
+    await get_existing_task(task_id)
     query = """
     UPDATE tasks
     SET title = :title,
@@ -73,10 +74,7 @@ async def update_task(task_id: int, task: TaskUpdate):
 
 @app.delete("/tasks/{task_id}/delete")
 async def delete_task(task_id: int):
-    query = "SELECT * FROM tasks WHERE id = :id"
-    existing_task = await database.fetch_one(query, values={"id": task_id})
-    if existing_task is None:
-        raise HTTPException(status_code=404, detail="Task not found")
+    await get_existing_task(task_id)
     query = """DELETE FROM tasks WHERE id = :id"""
     await database.fetch_one(query, values={"id": task_id})
     return {"message": "Task succesfully delete"}
