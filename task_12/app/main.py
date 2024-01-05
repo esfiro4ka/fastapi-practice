@@ -1,7 +1,7 @@
 from databases import Database
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
-from .models.models import Task, TaskCreate
+from fastapi import FastAPI, HTTPException
+from .models.models import Task, TaskCreate, TaskUpdate
 
 DATABASE_URL = "postgresql+asyncpg://admin:password@localhost:5432/dbname"
 
@@ -41,3 +41,42 @@ async def create_task(task: TaskCreate):
     """
     data = await database.fetch_one(query, values=dict(task))
     return dict(data)
+
+
+@app.get("/tasks/{task_id}", response_model=Task)
+async def read_task(task_id: int):
+    query = "SELECT * FROM tasks WHERE id = :id"
+    existing_task = await database.fetch_one(query, values={"id": task_id})
+    if existing_task:
+        return Task(**dict(existing_task))
+    else:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+
+@app.put("/tasks/{task_id}/update", response_model=Task)
+async def update_task(task_id: int, task: TaskUpdate):
+    query = "SELECT * FROM tasks WHERE id = :id"
+    existing_task = await database.fetch_one(query, values={"id": task_id})
+    if existing_task is None:
+        raise HTTPException(status_code=404, detail="Task not found")
+    query = """
+    UPDATE tasks
+    SET title = :title,
+        description = :description,
+        completed = :completed
+    WHERE id = :id
+    RETURNING *
+    """
+    data = await database.fetch_one(query, values=dict(task, id=task_id))
+    return dict(data)
+
+
+@app.delete("/tasks/{task_id}/delete")
+async def delete_task(task_id: int):
+    query = "SELECT * FROM tasks WHERE id = :id"
+    existing_task = await database.fetch_one(query, values={"id": task_id})
+    if existing_task is None:
+        raise HTTPException(status_code=404, detail="Task not found")
+    query = """DELETE FROM tasks WHERE id = :id"""
+    await database.fetch_one(query, values={"id": task_id})
+    return {"message": "Task succesfully delete"}
