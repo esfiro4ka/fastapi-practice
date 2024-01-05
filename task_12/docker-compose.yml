@@ -1,0 +1,14 @@
+version: '3'
+
+name: todo-service
+
+services:
+  postgres:
+    container_name: db
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: dbname
+    ports:
+      - "5432:5432"
