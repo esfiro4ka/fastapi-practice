@@ -1,0 +1,13 @@
+version: '3'
+
+name: products-alembic
+
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: dbproducts
+    ports:
+      - "5432:5432"
